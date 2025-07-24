@@ -3,7 +3,7 @@ const router = express.Router();
 const { validateLicense } = require("../controllers/licenseController");
 
 router.post("/validate", validateLicense);
-router.get("/", (req, res)=> {
+router.get("/", ()=> {
     return "Hello";
 });
 
