@@ -10,7 +10,7 @@ app.use(express.json());
 app.use("/api/license", licenseRoutes);
 
 app.get('/', (req, res) => {
-  res.send('hello world')
+  res.send('Welcome to license verification server!')
 })
 
 mongoose.connect(process.env.MONGODB_URI)
