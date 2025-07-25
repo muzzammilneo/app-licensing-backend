@@ -19,13 +19,13 @@ exports.allLicense = async (req, res) => {
 exports.validateLicense = async (req, res) => {
   const { licenseKey } = req.body;
 
-  if (!licenseKey) return res.status(400).json({ valid: false, reason: "Missing license key" });
+  if (!licenseKey) return res.status(400).json({ valid: false, message: "Missing license key" });
 
   const license = await License.findOne({ licenseKey });
 
-  if (!license) return res.status(404).json({ valid: false, reason: "License not found" });
-  if (!license.isActive) return res.status(403).json({ valid: false, reason: "License deactivated" });
-  if (license.expiresAt && new Date() > license.expiresAt) return res.status(403).json({ valid: false, reason: "License expired" });
+  if (!license) return res.status(404).json({ valid: false, message: "License not found" });
+  if (!license.isActive) return res.status(403).json({ valid: false, message: "License deactivated" });
+  if (license.expiresAt && new Date() > license.expiresAt) return res.status(403).json({ valid: false, message: "License expired" });
 
   return res.json({ valid: true, license });
 };
@@ -36,7 +36,7 @@ exports.registerLicense = async (req, res) => {
     const { user, address, contact, licenseKey } = req.body;
 
     if (!licenseKey || !contact) {
-      return res.status(400).json({ success: false, reason: "Missing license key, contact, or device ID" });
+      return res.status(400).json({ success: false, message: "Missing license key, contact, or device ID" });
     }
 
     // Check if any of the identifiers already exist
@@ -50,7 +50,7 @@ exports.registerLicense = async (req, res) => {
       let conflictField = "";
       if (existing.licenseKey === licenseKey) conflictField = "licenseKey";
 
-      return res.status(403).json({ success: false, reason: `${conflictField} already in use` });
+      return res.status(403).json({ success: false, message: `${conflictField} already in use` });
     }
 
     // Create and save new license
@@ -71,7 +71,7 @@ exports.registerLicense = async (req, res) => {
 
   } catch (error) {
     console.error("Registration error:", error);
-    return res.status(500).json({ success: false, reason: "Internal server error", error: error.message });
+    return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 };
 
