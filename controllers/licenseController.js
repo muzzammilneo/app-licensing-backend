@@ -1,11 +1,11 @@
 const License = require("../models/License");
 
 exports.allLicense = async (req, res) => {
-  if(!req.body) return res.status(400).json({ success: false, message: "You are not authorised to access!" });
+  if (!req.body) return res.status(400).json({ success: false, message: "You are not authorised to access!" });
 
   const { id } = req.body;
 
-  if(id === 'admin') {
+  if (id === 'admin') {
     try {
       const licenses = await License.find();
       return res.json(licenses);
@@ -93,6 +93,36 @@ exports.deleteLicense = async (req, res) => {
 
   } catch (error) {
     console.error("Delete license error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+exports.updateLicense = async (req, res) => {
+  try {
+    const { licenseKey, ...updates } = req.body;
+
+    if (!licenseKey) {
+      return res.status(400).json({ success: false, message: "License key is required in body" });
+    }
+
+    // Find the license and apply updates
+    const updatedLicense = await License.findOneAndUpdate(
+      { licenseKey },
+      updates
+    );
+
+    if (!updatedLicense) {
+      return res.status(404).json({ success: false, message: "License not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "License updated successfully",
+      license: updatedLicense
+    });
+
+  } catch (error) {
+    console.error("Update license error:", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

@@ -6,6 +6,7 @@ const licenseSchema = new mongoose.Schema({
   contact: String,
   licenseKey: { type: String, unique: true, required: true },
   isActive: { type: Boolean, default: true },
+  isUsable: { type: Boolean, default: true},
   expiresAt: Date,
 }, { timestamps: true });
 
