@@ -31,24 +31,22 @@ exports.validateLicense = async (req, res) => {
 
 exports.registerLicense = async (req, res) => {
   try {
-    const { user, address, contact, licenseKey, deviceId } = req.body;
+    const { user, address, contact, licenseKey } = req.body;
 
-    if (!licenseKey || !contact || !deviceId) {
+    if (!licenseKey || !contact) {
       return res.status(400).json({ success: false, reason: "Missing license key, contact, or device ID" });
     }
 
     // Check if any of the identifiers already exist
     const existing = await License.findOne({
       $or: [
-        { licenseKey },
-        { deviceId }
+        { licenseKey }
       ]
     });
 
     if (existing) {
       let conflictField = "";
       if (existing.licenseKey === licenseKey) conflictField = "licenseKey";
-      else if (existing.deviceId === deviceId) conflictField = "deviceId";
 
       return res.status(403).json({ success: false, reason: `${conflictField} already in use` });
     }
@@ -62,7 +60,6 @@ exports.registerLicense = async (req, res) => {
       address,
       contact,
       licenseKey,
-      deviceId,
       isActive: true,
       expiresAt: oneYearFromNow,
     });
