@@ -20,7 +20,7 @@ exports.validateLicense = async (req, res) => {
 
 exports.registerLicense = async (req, res) => {
   try {
-    const { licenseKey, email, deviceId } = req.body;
+    const { user, address, contact, licenseKey, deviceId } = req.body;
 
     if (!licenseKey || !email || !deviceId) {
       return res.status(400).json({ success: false, reason: "Missing license key, email, or device ID" });
@@ -30,7 +30,6 @@ exports.registerLicense = async (req, res) => {
     const existing = await License.findOne({
       $or: [
         { licenseKey },
-        { email },
         { deviceId }
       ]
     });
@@ -38,7 +37,6 @@ exports.registerLicense = async (req, res) => {
     if (existing) {
       let conflictField = "";
       if (existing.licenseKey === licenseKey) conflictField = "licenseKey";
-      else if (existing.email === email) conflictField = "email";
       else if (existing.deviceId === deviceId) conflictField = "deviceId";
 
       return res.status(403).json({ success: false, reason: `${conflictField} already in use` });
@@ -49,8 +47,10 @@ exports.registerLicense = async (req, res) => {
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
     const newLicense = new License({
+      user,
+      address,
+      contact,
       licenseKey,
-      email,
       deviceId,
       isActive: true,
       expiresAt: oneYearFromNow,
