@@ -1,5 +1,19 @@
 const License = require("../models/License");
 
+exports.allLicense = async (req, res) => {
+  const { id } = req.body;
+
+  if(id === 'admin') {
+    try {
+      const licenses = await License.find();
+      return res.json(licenses);
+    } catch (error) {
+      console.error("Error fetching licenses:", error);
+      return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  }
+};
+
 exports.validateLicense = async (req, res) => {
   const { licenseKey, deviceId } = req.body;
 
@@ -22,8 +36,8 @@ exports.registerLicense = async (req, res) => {
   try {
     const { user, address, contact, licenseKey, deviceId } = req.body;
 
-    if (!licenseKey || !email || !deviceId) {
-      return res.status(400).json({ success: false, reason: "Missing license key, email, or device ID" });
+    if (!licenseKey || !contact || !deviceId) {
+      return res.status(400).json({ success: false, reason: "Missing license key, contact, or device ID" });
     }
 
     // Check if any of the identifiers already exist
@@ -61,7 +75,7 @@ exports.registerLicense = async (req, res) => {
 
   } catch (error) {
     console.error("Registration error:", error);
-    return res.status(500).json({ success: false, reason: "Internal server error" });
+    return res.status(500).json({ success: false, reason: "Internal server error", error: error.message });
   }
 };
 
